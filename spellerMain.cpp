@@ -8,7 +8,7 @@
 /* LEAVE THIS FILE AS IS! DO NOT MODIFY ANYTHING! =]            */
 /****************************************************************/
 
-// #include "speller.hpp"
+#include "commonWords.hpp"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
