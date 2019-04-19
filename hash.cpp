@@ -34,7 +34,7 @@ HashTable :: ~HashTable(){
     delete[] hashTable;
 }
 
-void HashTable :: addWord(string word, string mispelling){
+void HashTable :: addWord(string word){
     unsigned int hashValue = getHash(word);
     if(!searchTable(word)){
         vocab* newVocab = new vocab;
