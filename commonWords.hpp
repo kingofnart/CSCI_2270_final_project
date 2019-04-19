@@ -6,8 +6,8 @@ using namespace std;
 
 // Struct for a tree node
 struct Node{
-    string mispelling; // misspelled word
-    string correct; // correctly spelled word
+    string correct; // correct spelling
+    string mispelling; // misspelling
     Node* left = nullptr; // pointer to the leftchild node
     Node* right = nullptr; // pointer to the rightchild node
 };
@@ -18,7 +18,7 @@ class BST{
       Node* root; // pointer to the root of the BST
       Node* addNodeHelper(Node* currNode, string data1, string data2);
       Node* deleteNodeHelper(Node *currNode, string value);
-      Node* searchKeyHelper(Node* currNode, string data);
+      Node* searchHelper(Node* currNode, string data1);
       void destroyNode(Node *currNode);
       void printTreeHelper(Node* currNode);
       void print2DUtilHelper(Node *, int);
@@ -26,7 +26,7 @@ class BST{
     public:
 
       BST();
-      BST(string data);
+      BST(string data1, string data2);
       ~BST();
       Node* getRoot();
       void addNode(string, string);
@@ -34,7 +34,7 @@ class BST{
       void preOrder(Node *node);
       void inOrder(Node *node);
       void postOrder(Node *node);
-      bool searchKey(string);
+      string searchKey(string);
       void printTree();
       void print2DUtil(int space);
 
