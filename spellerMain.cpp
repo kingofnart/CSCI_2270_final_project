@@ -9,6 +9,7 @@
 /****************************************************************/
 
 #include "commonWords.hpp"
+#include "hash.hpp"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -24,133 +25,172 @@
 
 using namespace std;
 
-// int split (string str, char c, string array[], int size) // Provided Function
-//      {
-//         if (str.length() == 0) {
-//              return 0;
-//          }
-//         string word = "";
-//         int count = 0;
-//         str = str + c;
-//         for (int i = 0; i < str.length(); i++)
-//         {
-//             if (str[i] == c)
-//             {
-//                 if (word.length() == 0)
-//                     continue;
-//                 array[count++] = word;
-//                 word = "";
-//             } else {
-//                 word = word + str[i];
-//             }
-//         }
-//         return count ;
-//      }
-//
-// int readCommonWords (string filename) // Add the Common Words
-// {
-//     ifstream vocabulary;
-//     vocabulary.open (filename); // Open the File
-//     if (vocabulary.is_open ())
-//     {
-//         int i = 0;
-//         string word = "";
-//         while (getline (vocabulary, word)) // While Words can be Read
-//         {
-//           // Add the Word to the Common Words Hash Table
-//             vocab [i] = word; // Set the Vocab in the Array
-//             ++i;
-//         }
-//         vocabulary.close (); // Close the File
-//         return true;
-//     }
-//     return false;
-// }
-//
-// bool readMisspellings (string filename) // Add the Misspellings
-// {
-//     ifstream misspelling;
-//     misspelling.open (filename); // Open the File
-//     if (misspelling.is_open())
-//     {
-//         int i = 0;
-//         string word = "";
-//         string words2 [2]; // Split Correct/Corrections
-//         string words3 [25]; // Split Corrections
-//         while (getline (misspelling, word))
-//         {
-//             split (word, ',', words2,  2); // Split Correct/Corrections
-//             misspel [i] [0] = words2 [0]; // Set the Correct Word
-//             // cout << misspel [i] [0];
-//             // cout << " 1: " << words2 [0].length () << " 2: " << words2 [1].length() << endl;
-//             string correction = words2 [1];
-//             bool check = false;
-//             for (int z = 0; z < correction.length(); z++) // For the length of the corrections
-//             {
-//                 if (correction [z] == '|') // If there is more than one
-//                 {
-//                     check = true;
-//                 }
-//             }
-//             // cout << " " << check;
-//             if (!check) // If there is one Correction
-//             {
-//                 misspel [i] [1] = words2 [1]; // Set the Correction
-//                 // cout << " " << misspel [i] [1] << endl;
-//             }
-//             else // If there is more than one Correction
-//             {
-//                 for (int z = 0; z < 25; z++) // Empty the Corrections Split String
-//                 {
-//                     words3 [z] = "";
-//                 }
-//                 split (words2 [1], '|', words3,  25); // Split the Corrections
-//                 for (int z = 0; z < 25; z++)
-//                 {
-//                     if (words3 [z].length() > 0) // While there are Corrections
-//                     {
-//                         misspel [i] [z+1] = words3 [z]; // Set the Corrections
-//                         // cout << " " << misspel [i] [z+1] << " ";
-//                     }
-//                     else // End Setting Corrections
-//                     {
-//                         z = 25;
-//                     }
-//                 }
-//                 // cout << endl;
-//             }
-//             // bool verify = false;
-//              ++i;
-//         }
-//         int count = 0;
-//         for (int z = 0; z < 3000; z++) // For the Number of Misspelling Words
-//         {
-//             bool verify = false;
-//             for (int i = 0; i < 4000; i++) // For the Number of Vocab Words
-//             {
-//                 if (misspel [z][0] == vocab [i])
-//                 {
-//                     verify = true; // The word exists in Vocab
-//                 }
-//             }
-//             if (!verify) // If the word does not exist
-//             {
-//                 // cout << misspel [z] [0] << endl;
-//                 vocab [3006 + count] = misspel [z] [0]; // Add the Word to Vocab
-//                 ++count;
-//             }
-//         }
-//         // cout << "count: " << count;
-//         // cout << "vocab 3007 " << vocab [3006] << endl;
-//         misspelling.close (); // Close the File
-//         return i;
-//     }
-//     else
-//     {
-//         cout << "misspelling.txt does not exist" << endl; // The File does not Exist
-//         return false;
-//     }
-//   }
+int split (string str, char c, string array[], int size) // Provided Function
+     {
+        if (str.length() == 0) {
+             return 0;
+         }
+        string word = "";
+        int count = 0;
+        str = str + c;
+        for (int i = 0; i < str.length(); i++)
+        {
+            if (str[i] == c)
+            {
+                if (word.length() == 0)
+                    continue;
+                array[count++] = word;
+                word = "";
+            } else {
+                word = word + str[i];
+            }
+        }
+        return count ;
+     }
+
+int readCommonWords (string filename, HashTable hashing) // Add the Common Words
+{
+    ifstream vocabulary;
+    vocabulary.open (filename); // Open the File
+    if (vocabulary.is_open ())
+    {
+        int i = 0;
+        string word = "";
+        while (getline (vocabulary, word)) // While Words can be Read
+        {
+          // Add the Word to the Common Words Hash Table
+            // vocab [i] = word; // Set the Vocab in the Array
+            hashing.addWord (word);
+            // ++i;
+        }
+        vocabulary.close (); // Close the File
+        return true;
+    }
+    return false;
+}
+
+bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add the Misspellings
+{
+    ifstream misspelling;
+    misspelling.open (filename); // Open the File
+    if (misspelling.is_open())
+    {
+        int i = 0;
+        string word = "";
+        string words2 [2]; // Split Correct/Corrections
+        string words3 [25]; // Split Corrections
+        while (getline (misspelling, word))
+        {
+            split (word, ',', words2,  2); // Split Correct/Corrections
+            // misspel [i] [0] = words2 [0]; // Set the Correct Word
+            // cout << misspel [i] [0];
+            // cout << " 1: " << words2 [0].length () << " 2: " << words2 [1].length() << endl;
+            string correction = words2 [1];
+            bool check = false;
+            for (int z = 0; z < correction.length(); z++) // For the length of the corrections
+            {
+                if (correction [z] == '|') // If there is more than one
+                {
+                    check = true;
+                }
+            }
+            // cout << " " << check;
+            if (!check) // If there is one Correction
+            {
+                // misspel [i] [1] = words2 [1]; // Set the Correction
+                treeing.addNode (words2 [1], words2 [0]); // Set the Correction
+                // cout << " " << misspel [i] [1] << endl;
+            }
+            else // If there is more than one Correction
+            {
+                for (int z = 0; z < 25; z++) // Empty the Corrections Split String
+                {
+                    words3 [z] = "";
+                }
+                split (words2 [1], '|', words3,  25); // Split the Corrections
+                for (int z = 0; z < 25; z++)
+                {
+                    if (words3 [z].length() > 0) // While there are Corrections
+                    {
+                        // misspel [i] [z+1] = words3 [z]; // Set the Corrections
+                        treeing.addNode (words3 [z], words2 [0]); // Set the Correction
+                        // cout << " " << misspel [i] [z+1] << " ";
+                    }
+                    else // End Setting Corrections
+                    {
+                        z = 25;
+                    }
+                }
+                // cout << endl;
+            }
+            bool verify = false;
+            if (hashing.isInTable (words2 [0])) // If the Misspelling Record is in the HashTable
+            {
+              verify = true; // The Word Exists
+            }
+            if (!verify) // If the word does not exist
+            {
+                // cout << misspel [z] [0] << endl;
+                // vocab [3006 + count] = misspel [z] [0]; // Add the Word to Vocab
+                hashing.addWord (words2 [0]); // Add the Word to Vocab
+                // ++count;
+            }
+             ++i;
+        }
+        // int count = 0;
+        // for (int z = 0; z < 3000; z++) // For the Number of Misspelling Words
+        // {
+        //     bool verify = false;
+        //     // for (int i = 0; i < 4000; i++) // For the Number of Vocab Words
+        //     // {
+        //     //     if (misspel [z][0] == vocab [i])
+        //     //     {
+        //     //         verify = true; // The word exists in Vocab
+        //     //     }
+        //     // }
+        //     if (hasing.isInTable ())
+        //     if (!verify) // If the word does not exist
+        //     {
+        //         // cout << misspel [z] [0] << endl;
+        //         vocab [3006 + count] = misspel [z] [0]; // Add the Word to Vocab
+        //         ++count;
+        //     }
+        // }
+        // cout << "count: " << count;
+        // cout << "vocab 3007 " << vocab [3006] << endl;
+        misspelling.close (); // Close the File
+        return i;
+    }
+    else
+    {
+        cout << "misspelling.txt does not exist" << endl; // The File does not Exist
+        return false;
+    }
+  }
+
+  string checkWord (string word, HashTable hashing, BST treeing)
+  {
+      bool verify = false;
+      bool incorrect = false;
+      string newWord = "";
+      if (hashing.isInTable (word)) // If the Word is a Common Word
+      {
+        return word; // Return the Word
+      }
+      else
+      {
+        string correction = treeing.searchKey (word);
+        if (correction != "") // If the Word is in the Misspellings
+        {
+          return correction; // Return the correction
+        }
+        else
+        {
+          return "unknown";
+        }
+        // return newWord;
+  }
+}
 
 string lowerCase (string phrase) // Make a word Lowercase
 {
@@ -177,11 +217,16 @@ int main (int argc, char *argv[])
   string phrase = ""; // The phrase that is entered
   string newPhrase = ""; // The corrected phrase
   string finalPhrase = ""; // The final phrase
+
   //Read in the Common Words File
   // readCommonWords (argv [1]);
-  //
+  HashTable hashing (700); // Create a HashTable
+  readCommonWords (argv [1], hashing);
+
   // //Read in the Misspellings File
   // readMisspellings (argv [1]);
+  BST treeing;
+  readMisspellings (argv [2], hashing, treeing);
 
   cout << "Enter the phrase you would like to correct: "; // Get the phrase
   // getline (cin, phrase);
@@ -257,7 +302,7 @@ int main (int argc, char *argv[])
           // cout << checkWord (changeWord, vocab, misspel) << " ";
           // cout << changeWord << " ";
           // changeWord = "";
-          finalPhrase = finalPhrase + checkWord (changeWord, vocab, misspel); // Add the Looked Up Word
+          finalPhrase = finalPhrase + checkWord (changeWord, hashing, treeing); // Add the Looked Up Word
           changeWord = ""; // Clear the Word
           finalPhrase = finalPhrase + ' '; // Add the Space
       }
@@ -267,7 +312,7 @@ int main (int argc, char *argv[])
           // cout << checkWord (changeWord, vocab, misspel) << " ";
           // cout << changeWord << " ";
           // changeWord = "";
-          finalPhrase = finalPhrase + checkWord (changeWord, vocab, misspel); // Add the Looked Up Word
+          finalPhrase = finalPhrase + checkWord (changeWord, hashing, treeing); // Add the Looked Up Word
           changeWord = ""; // Clear the Accumulated Word
           finalPhrase = finalPhrase + changePhrase [i]; // Add the Symbol
       }
