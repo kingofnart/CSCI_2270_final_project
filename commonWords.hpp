@@ -6,7 +6,8 @@ using namespace std;
 
 // Struct for a tree node
 struct Node{
-    string key; // data to be stored in the node
+    string mispelling; // misspelled word
+    string correct; // correctly spelled word
     Node* left = nullptr; // pointer to the leftchild node
     Node* right = nullptr; // pointer to the rightchild node
 };
