@@ -34,11 +34,12 @@ HashTable :: ~HashTable(){
     delete[] hashTable;
 }
 
-void HashTable :: addWord(string word){
+void HashTable :: addWord(string word, string mispelling){
     unsigned int hashValue = getHash(word);
     if(!searchTable(word)){
         vocab* newVocab = new vocab;
         newVocab->word = word;
+        newVocab->mispelling = mispelling;
         newVocab->next = nullptr;
         
         if(hashTable[hashValue] == nullptr){
