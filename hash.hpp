@@ -14,8 +14,7 @@ class HashTable {
   public:
     HashTable(int newHashTableSize);
     ~HashTable();
-    void addMispelling(string mispelling);
-    void addWord(string word); // Add a Vocab Word
+    void addWord(string word, string mispelling); // Add a Vocab Word
     bool isInTable(string word); // Search for a Word in Vocabulary
 
   private:
