@@ -11,9 +11,10 @@ Method Name: createNode
 Purpose: Create a node with key as 'data'
 return: pointer to the new node
 */
-Node* BST::createNode(string data){
+Node* BST::createNode(string data1, string data2){
   Node *newNode = new Node;
-  newNode->key = data;
+  newNode->mispelling = data1;
+  newNode->correct = data2;
   newNode->left = nullptr;
   newNode->right = nullptr;
   return newNode;
@@ -52,16 +53,16 @@ Purpose: This function will add a node with key as 'data' in the tree rooted at 
 Call this function from addNode().
 return: currNode
 */
-Node* BST::addNodeHelper(Node* currNode, string data){
+Node* BST::addNodeHelper(Node* currNode, string data1, string data2){
   if(root == nullptr){ //if tree is empty
-    root = createNode(data);
+    root = createNode(data1, data2);
     return root;
   }
   if(currNode == nullptr){ //check if you've reached insert spot
-    return createNode(data);
+    return createNode(data1, data2);
   }
   //else keep going down tree until you reach null
-  if(currNode->key < data){
+  if(currNode->correct < data){
     currNode->right = addNodeHelper(currNode->right, data);
   }
   else if(currNode->key > data){
@@ -72,8 +73,8 @@ Node* BST::addNodeHelper(Node* currNode, string data){
 
 
 // function to insert a node in the tree. This function calls the addNodeHelper()
-void BST::addNode(string data){
-  Node* addedNode = addNodeHelper(root, data);
+void BST::addNode(string data1, string data2){
+  Node* addedNode = addNodeHelper(root, data1, data2);
   cout << data << " has been added" << endl;
 }
 
@@ -217,9 +218,9 @@ Node* BST::searchKeyHelper(Node* currNode, string data){
 
 // function to search a data in the tree. This function calls the searchKeyHelper()
 // returns True if it exists otherwise False
-bool BST::searchKey(string data){
-  if(searchKeyHelper(root, data) != nullptr){
-    return true;
+ string BST::searchKey(string data){
+  if(Node* node = searchKeyHelper(root, data) != nullptr){
+    return node->;
   }
   cout << data << " not present in the tree" << endl;
   return false;
@@ -271,7 +272,8 @@ void BST::print2DUtilHelper(Node *currNode, int space)
     printf("\n");
     for (int i = 10; i < space; i++)
         printf(" ");
-    printf("%d\n", currNode->key);
+    printf("%d\n");
+    cout <<  currNode->key;
 
     // Process left child
     print2DUtilHelper(currNode->left, space);
