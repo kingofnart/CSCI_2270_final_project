@@ -6,7 +6,6 @@ using namespace std;
 struct vocab // Vocab Record
 {
     string word; // The Word
-    string mispelling;
     vocab* next; // The Next Word
 };
 
