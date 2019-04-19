@@ -16,7 +16,7 @@ class BST{
     private:
       Node* createNode(string data);
       Node* root; // pointer to the root of the BST
-      Node* addNodeHelper(Node* currNode, string data);
+      Node* addNodeHelper(Node* currNode, string data1, string data2);
       Node* deleteNodeHelper(Node *currNode, string value);
       Node* searchKeyHelper(Node* currNode, string data);
       void destroyNode(Node *currNode);
@@ -29,7 +29,7 @@ class BST{
       BST(string data);
       ~BST();
       Node* getRoot();
-      void addNode(string);
+      void addNode(string, string);
       void deleteNode(string);
       void preOrder(Node *node);
       void inOrder(Node *node);
