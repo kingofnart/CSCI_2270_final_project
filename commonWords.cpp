@@ -220,7 +220,7 @@ Node* BST::searchKeyHelper(Node* currNode, string data){
 // returns True if it exists otherwise False
  string BST::searchKey(string data){
   if(Node* node = searchKeyHelper(root, data) != nullptr){
-    return node->;
+    return node->correct;
   }
   cout << data << " not present in the tree" << endl;
   return false;
