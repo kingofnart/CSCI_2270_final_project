@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "commonWords.hpp"
+#include "BST.hpp"
 using namespace std;
 
 //********************* CREATE NODE & GETROOT FUNCTIOINS ***********************
@@ -8,7 +8,7 @@ using namespace std;
 
 /*
 Method Name: createNode
-Purpose: Create a node with key as 'data'
+Purpose: Create a node with mispelling as 'data'
 return: pointer to the new node
 */
 Node* BST::createNode(string data1, string data2){
@@ -49,7 +49,7 @@ void BST::destroyNode(Node *currNode){
 
 /*
 Method Name: addNodeHelper
-Purpose: This function will add a node with key as 'data' in the tree rooted at 'currNode'.
+Purpose: This function will add a node with mispelling as 'data' in the tree rooted at 'currNode'.
 Call this function from addNode().
 return: currNode
 */
@@ -62,11 +62,11 @@ Node* BST::addNodeHelper(Node* currNode, string data1, string data2){
     return createNode(data1, data2);
   }
   //else keep going down tree until you reach null
-  if(currNode->correct < data){
-    currNode->right = addNodeHelper(currNode->right, data);
+  if(currNode->mispelling < data1){
+    currNode->right = addNodeHelper(currNode->right, data1, data2);
   }
-  else if(currNode->key > data){
-    currNode->left = addNodeHelper(currNode->left, data);
+  else if(currNode->mispelling > data1){
+    currNode->left = addNodeHelper(currNode->left, data1, data2);
   }
   return currNode;
 }
@@ -75,7 +75,7 @@ Node* BST::addNodeHelper(Node* currNode, string data1, string data2){
 // function to insert a node in the tree. This function calls the addNodeHelper()
 void BST::addNode(string data1, string data2){
   Node* addedNode = addNodeHelper(root, data1, data2);
-  cout << data << " has been added" << endl;
+  cout << data1 << " has been added" << endl;
 }
 
 
@@ -84,7 +84,7 @@ void BST::addNode(string data1, string data2){
 
 /*
 Method Name: deleteNodeHelper
-Purpose: This function deletes the node with 'value' as it's key from the tree rooted at 'currNode'.
+Purpose: This function deletes the node with 'value' as it's mispelling from the tree rooted at 'currNode'.
 Call this function from deleteNode()
 return: currNode
 */
@@ -93,11 +93,11 @@ Node* BST::deleteNodeHelper(Node *currNode, string value){
   {
     return NULL;
   }
-  else if(value < currNode->key)
+  else if(value < currNode->mispelling)
   {
     currNode->left = deleteNodeHelper(currNode->left, value);
   }
-  else if(value > currNode->key)
+  else if(value > currNode->mispelling)
   {
     currNode->right = deleteNodeHelper(currNode->right, value);
   }
@@ -138,11 +138,11 @@ Node* BST::deleteNodeHelper(Node *currNode, string value){
         else{
           if(parent==currNode){
             parent->right=nextNode->right;
-            currNode->key = nextNode->key;
+            currNode->mispelling = nextNode->mispelling;
           }
           else{
             parent->left = nextNode->right;
-            currNode->key = nextNode->key;
+            currNode->mispelling = nextNode->mispelling;
 
           }
           delete nextNode;
@@ -170,7 +170,7 @@ void preOrder(Node *node){
   if(node == nullptr){
     return;
   }
-  cout << node->key  << " " << endl;
+  cout << node->mispelling  << " " << endl;
   preOrder(node->left);
   preOrder(node->right);
 }
@@ -180,7 +180,7 @@ void inOrder(Node *node){
     return;
   }
   inOrder(node->left);
-  cout << node->key << " " << endl;
+  cout << node->mispelling << " " << endl;
   inOrder(node->right);
 }
 
@@ -190,7 +190,7 @@ void postOrder(Node *node){
   }
   postOrder(node->left);
   postOrder(node->right);
-  cout << node->key << " " << endl;
+  cout << node->mispelling << " " << endl;
 }
 
 
@@ -201,29 +201,30 @@ void postOrder(Node *node){
 
 
 /*
-Method Name: searchKeyHelper
-Purpose: This function will search for a node with "data" as it's key in a tree rooted at 'currNode'.
-Call this function from searchKey()
-return: Node with "data" as it's key if \found, otherwise NULL
+Method Name: searchmispellingHelper
+Purpose: This function will search for a node with "data" as it's mispelling in a tree rooted at 'currNode'.
+Call this function from searchmispelling()
+return: Node with "data" as it's mispelling if \found, otherwise NULL
 */
-Node* BST::searchKeyHelper(Node* currNode, string data){
-  if(currNode == nullptr || currNode->key == data){
+Node* BST::searchHelper(Node* currNode, string data1){
+  if(currNode == nullptr || currNode->mispelling == data1){
     return currNode;
   }
-  if(currNode->key > data){
-    return searchKeyHelper(currNode->left, data);
+  if(currNode->mispelling > data1){
+    return searchHelper(currNode->left, data1);
   }
-  return searchKeyHelper(currNode->right, data);
+  return searchHelper(currNode->right, data1);
 }
 
-// function to search a data in the tree. This function calls the searchKeyHelper()
+// function to search a data in the tree. This function calls the searchmispellingHelper()
 // returns True if it exists otherwise False
- string BST::searchKey(string data){
-  if(Node* node = searchKeyHelper(root, data) != nullptr){
+ string BST::searchKey(string data1){
+   Node* node = searchHelper(root, data1);
+  if(node != nullptr){
     return node->correct;
   }
-  cout << data << " not present in the tree" << endl;
-  return false;
+  cout << data1 << " not present in the tree" << endl;
+  return "";
 }
 
 
@@ -239,7 +240,7 @@ return: none
 void BST::printTreeHelper(Node* currNode){
   if(currNode){
      printTreeHelper(currNode->left);
-     cout << " " << currNode->key;
+     cout << " " << currNode->mispelling;
      printTreeHelper(currNode->right);
   }
 }
@@ -273,7 +274,7 @@ void BST::print2DUtilHelper(Node *currNode, int space)
     for (int i = 10; i < space; i++)
         printf(" ");
     printf("%d\n");
-    cout <<  currNode->key;
+    cout <<  currNode->mispelling;
 
     // Process left child
     print2DUtilHelper(currNode->left, space);
@@ -299,8 +300,8 @@ BST::BST(){
 }
 
 // parameterized constructor. It will create the root and put the 'data' in the root
-BST::BST(string data){
-  root = createNode(data);
+BST::BST(string data1, string data2){
+  root = createNode(data1, data2);
 }
 
 
