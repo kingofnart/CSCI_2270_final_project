@@ -14,7 +14,7 @@ struct Node{
 
 class BST{
     private:
-      Node* createNode(string data);
+      Node* createNode(string data1, string data2);
       Node* root; // pointer to the root of the BST
       Node* addNodeHelper(Node* currNode, string data1, string data2);
       Node* deleteNodeHelper(Node *currNode, string value);
