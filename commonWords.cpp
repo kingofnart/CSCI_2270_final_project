@@ -75,7 +75,7 @@ Node* BST::addNodeHelper(Node* currNode, string data1, string data2){
 // function to insert a node in the tree. This function calls the addNodeHelper()
 void BST::addNode(string data1, string data2){
   Node* addedNode = addNodeHelper(root, data1, data2);
-  cout << data1 << " has been added" << endl;
+  //cout << data1 << " has been added" << endl;
 }
 
 
