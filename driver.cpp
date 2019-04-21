@@ -8,17 +8,20 @@ using namespace std;
 using namespace std::chrono;
 
 string normalize(string input);
+void displayMenu();
 
-int main(int argc, char* argv[]){
-  if(argc == 2){
+int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; misspelled document
+  if(argc == 4){
+    //instantiate hash tables & binary search tree
     BST BSTree;
     HashTable SmallTable(1000);
     HashTable BigTable(1000);
-    ifstream inputFile;
-    inputFile.open(argv[1]); // Open the File
-    if(inputFile.is_open()){
+    //add mispellings to BST and correct spelling to hash table (all words to BigTable)
+    ifstream misspelledFile;
+    misspelledFile.open(argv[1]); // Open the File
+    if(misspelledFile.is_open()){
       string line, s, correct;
-      while(getline(inputFile, line)){
+      while(getline(misspelledFile, line)){
         int cnt = 0;
         for(int i=0; i<line.length(); i++){
           if(line[i] == ',' || line[i] == '|'){ // end of word add to main hash table
@@ -31,128 +34,64 @@ int main(int argc, char* argv[]){
             }
             BigTable.addWord(s, correct);
             s = "";
+            cnt++; //increment count (if not 0, word is misspelled)
           }
           else{
             s += line[i];
           }
         }
+        //add last word in line
         BSTree.addNode(s, correct);
         BigTable.addWord(s, correct);
         s = "";
       }
+      //add common words file to hash tables
+      ifstream commonWordsFile;
+      commonWordsFile.open(argv[2]);
+      while(getline(commonWordsFile, line)){
+        //new word on each line
+        SmallTable.addWord(line, "");
+        BigTable.addWord(line, line);
+        //s = "";
+      }
       string phrase, newPhrase;
-      cout << "Enter the phrase you would like to correct: " << endl;
-      getline(cin, phrase);
-      phrase = normalize(phrase);
-      for(int u=0; u<phrase.length(); u++){
-        if(phrase[u] == ' '){
-          //cout << "s: <" << s << "> ";
-          if(!SmallTable.isInTable(s)){
-            string search = BSTree.searchKey(s);
-            if(search == ""){
-              newPhrase += s + " (unkown) ";
-            }
-            else{
-              newPhrase += search + " ";
-            }
-          }
-          else{
-            newPhrase += s + " ";
-          }
-          s = "";
-        }
-        else{
-          s += phrase[u];
-        }
-      }
-      if(!SmallTable.isInTable(s)){
-        string search = BSTree.searchKey(s);
-        if(search == ""){
-          newPhrase += s + " (unkown)";
-        }
-        else{
-          newPhrase += search;
-        }
-      }
-      else{
-        newPhrase += s;
-      }
-      s = "";
-      cout << "Your corrected phrase:" << endl;
-      cout << newPhrase << endl;
-      newPhrase = "";
-      //timing hashTable vs hashTable and BST **********************************
-      //hashTable and BST:
+      //******************timing hashTable vs hashTable and BST*****************
+      //************************hashTable and BST ******************************
       auto start = high_resolution_clock::now();
       ifstream inputFile1;
-      inputFile1.open(argv[1]);
+      inputFile1.open(argv[3]);
       while(getline(inputFile1, line)){
-        //cout << newPhrase.length() << " -- ";
-        for(int p=0; p<line.length(); p++){
-          if(line[p] == ',' || line[p] == '|'){
-            if(!SmallTable.isInTable(s)){
-              string search = BSTree.searchKey(s);
-              if(search == ""){
-                newPhrase += s + " (unkown) ";
-              }
-              else{
-                newPhrase += search + " ";
-              }
-            }
-            else{
-              newPhrase += s + " ";
-            }
-            s = "";
-          }
-          else{
-            s += line[p];
-          }
-        }
-        if(!SmallTable.isInTable(s)){
-          string search = BSTree.searchKey(s);
+        string normalWord = normalize(line);
+        if(!SmallTable.isInTable(normalWord)){
+          string search = BSTree.searchKey(normalWord);
           if(search == ""){
-            newPhrase += s + " (unkown)";
+            newPhrase += normalWord + " (unkown) ";
           }
           else{
-            newPhrase += search;
+            newPhrase += search + " ";
           }
         }
         else{
-          newPhrase += s;
+          newPhrase += normalWord + " ";
         }
-        s = "";
+        //s = "";
       }
-      s = "";
+      //s = "";
       cout << newPhrase.length() << endl;
       newPhrase = "";
       auto middle = high_resolution_clock::now();
-      // only hashTable:
+      // only hashTable: *******************************************************
       ifstream inputFile2;
-      inputFile2.open(argv[1]);
+      inputFile2.open(argv[3]);
       while(getline(inputFile2, line)){
-        //cout << newPhrase.length() << " -- ";
-        for(int y=0; y<line.length(); y++){
-          if(line[y] == ',' || line[y] == '|'){
-            if(!BigTable.isInTable(s)){
-              newPhrase += s + " (unkown) ";
-            }
-            else{
-              newPhrase += (BigTable.searchTable(s))->correctSpelling + " ";
-            }
-            s = "";
-          }
-          else{
-            s += line[y];
-          }
-        }
-        if(!BigTable.isInTable(s)){
-          newPhrase += s + " (unkown) ";
+        string normalWord = normalize(line);
+        if(!BigTable.isInTable(normalWord)){
+          newPhrase += normalWord + " (unkown) ";
         }
         else{
-          newPhrase += (BigTable.searchTable(s))->correctSpelling + " ";
+          newPhrase += (BigTable.searchTable(normalWord))->correctSpelling + " ";
         }
       }
-      s = "";
       cout << newPhrase.length() << endl;
       newPhrase = "";
       auto stop = high_resolution_clock::now();
@@ -160,13 +99,63 @@ int main(int argc, char* argv[]){
       auto duration2 = duration_cast<microseconds>(stop - middle);
       cout << "BST & Hash Table count: " << duration1.count() << endl;
       cout << "Hash Table only count: " << duration2.count() << endl;
+      string choice = "1";
+      while(stoi(choice) != 2){
+        displayMenu();
+        getline(cin, choice);
+        switch(stoi(choice)){
+          case 1:
+          cout << "Enter the phrase you would like to correct: " << endl;
+          getline(cin, phrase);
+          phrase = normalize(phrase);
+          for(int u=0; u<phrase.length(); u++){
+            if(phrase[u] == ' '){
+              if(!SmallTable.isInTable(s)){
+                string search = BSTree.searchKey(s);
+                if(search == ""){
+                  newPhrase += s + " (unkown) ";
+                }
+                else{
+                  newPhrase += search + " ";
+                }
+              }
+              else{
+                newPhrase += s + " ";
+              }
+              s = "";
+            }
+            else{
+              s += phrase[u];
+            }
+          }
+          if(!SmallTable.isInTable(s)){
+            string search = BSTree.searchKey(s);
+            if(search == ""){
+              newPhrase += s + " (unkown)";
+            }
+            else{
+              newPhrase += search;
+            }
+          }
+          else{
+            newPhrase += s;
+          }
+          s = "";
+          cout << "Your corrected phrase:" << endl;
+          cout << newPhrase << endl;
+          newPhrase = "";
+          break;
+
+          case 2:
+          cout << "Goodbye!" << endl;
+          break;
+        }
+      }
+
     } //if(file.is_open) '}'
     else{ //file didnt open
       cout << argv[1] << " does not exist" << endl;
     }
-    // else{
-    //   cout << "not enough command line arguments" << endl;
-    // }
   }
   return 0;
 }
@@ -189,4 +178,10 @@ string normalize(string input){
     }
   }
   return output;
+}
+
+void displayMenu(){
+  cout << "============Menu============" << endl;
+  cout << "1. Input a phrase you would like corrected" << endl;
+  cout << "2. Quit" << endl;
 }
