@@ -223,7 +223,7 @@ Node* BST::searchHelper(Node* currNode, string data1){
   if(node != nullptr){
     return node->correct;
   }
-  cout << data1 << " not present in the tree" << endl;
+  //cout << data1 << " not present in the tree" << endl;
   return "";
 }
 
