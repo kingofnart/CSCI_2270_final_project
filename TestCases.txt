@@ -1,0 +1,7 @@
+// Test Cases
+ // phrase = "...,, $%!HELLO WORLD! My firends are qwer.";
+  // phrase = "Do    you knwo youself?";
+  // phrase = "I loev C++";
+  // phrase = "!!! A lightyear is a distaNCe UiTN!!!";
+  // phrase = ", xxx Thsi is 21 centruy NOW!!!";
+// phrase = "xxx @ yyy @ zzz";
