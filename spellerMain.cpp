@@ -22,8 +22,11 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+#include <time.h>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 int split (string str, char c, string array[], int size) // Provided Function
      {
@@ -48,7 +51,7 @@ int split (string str, char c, string array[], int size) // Provided Function
         return count ;
      }
 
-int readCommonWords (string filename, HashTable hashing) // Add the Common Words
+bool readCommonWords (string filename, HashTable * hashing) // Add the Common Words
 {
     ifstream vocabulary;
     vocabulary.open (filename); // Open the File
@@ -60,7 +63,8 @@ int readCommonWords (string filename, HashTable hashing) // Add the Common Words
         {
           // Add the Word to the Common Words Hash Table
             // vocab [i] = word; // Set the Vocab in the Array
-            hashing.addWord (word);
+            hashing -> addWord (word);
+            // cout << word << endl;
             // ++i;
         }
         vocabulary.close (); // Close the File
@@ -69,23 +73,32 @@ int readCommonWords (string filename, HashTable hashing) // Add the Common Words
     return false;
 }
 
-bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add the Misspellings
+int readMisspellings (string filename, BST * treeing, HashTable * hashing) // Add the Misspellings
 {
+  // cout << "started" << endl;
     ifstream misspelling;
+    // cout << "testing" << endl;
     misspelling.open (filename); // Open the File
     if (misspelling.is_open())
     {
+      // cout << "opened" << endl;
         int i = 0;
         string word = "";
         string words2 [2]; // Split Correct/Corrections
         string words3 [25]; // Split Corrections
         while (getline (misspelling, word))
         {
+          // cout << "reading" << endl;
+          // if (i == 0)
+          // {
+          //   cout << word << endl;
+          // }
             split (word, ',', words2,  2); // Split Correct/Corrections
             // misspel [i] [0] = words2 [0]; // Set the Correct Word
             // cout << misspel [i] [0];
             // cout << " 1: " << words2 [0].length () << " 2: " << words2 [1].length() << endl;
             string correction = words2 [1];
+            // cout << correction << endl;
             bool check = false;
             for (int z = 0; z < correction.length(); z++) // For the length of the corrections
             {
@@ -97,9 +110,12 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
             // cout << " " << check;
             if (!check) // If there is one Correction
             {
+              // cout << words2 [0] << endl;
                 // misspel [i] [1] = words2 [1]; // Set the Correction
-                treeing.addNode (words2 [1], words2 [0]); // Set the Correction
+                treeing -> addNode (words2 [1], words2 [0]); // Set the Correction
+                // cout << words2 [0] << endl;
                 // cout << " " << misspel [i] [1] << endl;
+                ++i;
             }
             else // If there is more than one Correction
             {
@@ -112,9 +128,11 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
                 {
                     if (words3 [z].length() > 0) // While there are Corrections
                     {
+                      // cout << "here";
                         // misspel [i] [z+1] = words3 [z]; // Set the Corrections
-                        treeing.addNode (words3 [z], words2 [0]); // Set the Correction
+                        treeing -> addNode (words3 [z], words2 [0]); // Set the Correction
                         // cout << " " << misspel [i] [z+1] << " ";
+                        ++i;
                     }
                     else // End Setting Corrections
                     {
@@ -124,7 +142,7 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
                 // cout << endl;
             }
             bool verify = false;
-            if (hashing.isInTable (words2 [0])) // If the Misspelling Record is in the HashTable
+            if (hashing -> isInTable (words2 [0])) // If the Misspelling Record is in the HashTable
             {
               verify = true; // The Word Exists
             }
@@ -132,11 +150,12 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
             {
                 // cout << misspel [z] [0] << endl;
                 // vocab [3006 + count] = misspel [z] [0]; // Add the Word to Vocab
-                hashing.addWord (words2 [0]); // Add the Word to Vocab
+                hashing -> addWord (words2 [0]); // Add the Word to Vocab
                 // ++count;
             }
-             ++i;
+             // ++i;
         }
+        // cout << "ended";
         // int count = 0;
         // for (int z = 0; z < 3000; z++) // For the Number of Misspelling Words
         // {
@@ -148,7 +167,7 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
         //     //         verify = true; // The word exists in Vocab
         //     //     }
         //     // }
-        //     if (hasing.isInTable ())
+        //     if (hashing.isInTable ())
         //     if (!verify) // If the word does not exist
         //     {
         //         // cout << misspel [z] [0] << endl;
@@ -159,6 +178,7 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
         // cout << "count: " << count;
         // cout << "vocab 3007 " << vocab [3006] << endl;
         misspelling.close (); // Close the File
+        // cout << "here";
         return i;
     }
     else
@@ -168,24 +188,28 @@ bool readMisspellings (string filename, HashTable hashing, BST treeing) // Add t
     }
   }
 
-  string checkWord (string word, HashTable hashing, BST treeing)
+  string checkWord (string word, HashTable * hashing, BST * treeing)
   {
+    // cout << "called";
       bool verify = false;
       bool incorrect = false;
       string newWord = "";
-      if (hashing.isInTable (word)) // If the Word is a Common Word
+      if (hashing -> isInTable (word)) // If the Word is a Common Word
       {
+        // cout << "In Table: " << word <<endl;
         return word; // Return the Word
       }
       else
       {
-        string correction = treeing.searchKey (word);
+        string correction = treeing -> searchKey (word);
         if (correction != "") // If the Word is in the Misspellings
         {
+          // cout << "In Tree: " << word <<endl;
           return correction; // Return the correction
         }
         else
         {
+          // cout << "here";
           return "unknown";
         }
         // return newWord;
@@ -212,8 +236,16 @@ string lowerCase (string phrase) // Make a word Lowercase
     return newWord; // Return the Word
 }
 
+// bool readMisspelling (string filename, HashTable hashing)
+// {
+//   cout << "hello";
+//   return true;
+// }
+
 int main (int argc, char *argv[])
 {
+  double startTime, endTime;
+  double execTime;
   string phrase = ""; // The phrase that is entered
   string newPhrase = ""; // The corrected phrase
   string finalPhrase = ""; // The final phrase
@@ -221,26 +253,36 @@ int main (int argc, char *argv[])
   //Read in the Common Words File
   // readCommonWords (argv [1]);
   HashTable hashing (700); // Create a HashTable
-  readCommonWords (argv [1], hashing);
-
+  // cout << argv [1] << endl;
+  readCommonWords (argv [1], &hashing);
+  // HashTable hashing2 (100);
   // //Read in the Misspellings File
   // readMisspellings (argv [1]);
+  cout << "Read " << hashing.getNumItems () << " word from " << argv [1] << endl;
+
   BST treeing;
-  readMisspellings (argv [2], hashing, treeing);
+  cout << "Read " << readMisspellings (argv [2], &treeing, &hashing) << " lines from " << argv [2] << endl;
+  // cout << treeing.searchKey ("athenean");
+  // treeing.printTree ();
+
+  // if (!readMisspelling (argv [2], hashing2))
+  // {
+  //   return 0;
+  // }
 
   cout << "Enter the phrase you would like to correct: "; // Get the phrase
-  // getline (cin, phrase);
-
-  // Test Cases
+  // // getline (cin, phrase);
+  //
+  // // Test Cases
   phrase = "...,, $%!HELLO WORLD! My firends are qwer.";
   // phrase = "Do    you knwo youself?";
   // phrase = "I loev C++";
   // phrase = "!!! A lightyear is a distaNCe UiTN!!!";
   // phrase = ", xxx Thsi is 21 centruy NOW!!!";
   // phrase = "xxx @ yyy @ zzz";
-
+  //
   cout << endl << phrase << endl;
-  // Set the phrase from the first word
+  // // Set the phrase from the first word
   for (int i = 0; i < phrase.length(); i++) // For the Phrase
   {
       if (phrase [i] >= 'a' && phrase [i] <= 'z') // Once there is a letter
@@ -254,8 +296,8 @@ int main (int argc, char *argv[])
           i = phrase.length(); // End the Traversing
       }
   }
-
-  // Make the phrase lowercase
+  //
+  // // Make the phrase lowercase
   newPhrase = lowerCase (newPhrase); // Make the phrase lowercase
 
   // Remove the double spaces in the phrase
@@ -275,6 +317,7 @@ int main (int argc, char *argv[])
       }
       else // If there is a Space
       {
+        // cout << "spaced"
           if (newPhrase [i] == ' ' && space == false) // If there has not been a Space Before
           {
               space = true; // One Space has been Read
@@ -285,13 +328,18 @@ int main (int argc, char *argv[])
 
   // Check each word in the phrase and add to the Final Phrase
 
+  auto start = high_resolution_clock::now();
   changePhrase = changePhrase + '.'; // Read the Last Word with the Punctuation
   int position = 0;
   string changeWord = "";
+  // cout << changePhrase << endl;
+  // cout << changePhrase.length () << endl;
   for (int i = 0; i < changePhrase.length(); i++)
   {
+    // cout << i << endl;
       if (changePhrase [i] >= 'a' && changePhrase [i] <= 'z') // If there is a Letter
       {
+        // cout << "checking";
           changeWord = changeWord + changePhrase [i]; // Add the Letter
           // cout << changePhrase [i] << " ";
       }
@@ -302,9 +350,19 @@ int main (int argc, char *argv[])
           // cout << checkWord (changeWord, vocab, misspel) << " ";
           // cout << changeWord << " ";
           // changeWord = "";
-          finalPhrase = finalPhrase + checkWord (changeWord, hashing, treeing); // Add the Looked Up Word
-          changeWord = ""; // Clear the Word
-          finalPhrase = finalPhrase + ' '; // Add the Space
+          // cout << "Space, Word: " << changeWord << endl;
+          if (changeWord != "")
+          {
+            finalPhrase = finalPhrase + checkWord (changeWord, &hashing, &treeing); // Add the Looked Up Word
+            // cout << checkWord (changeWord, hashing, treeing);
+            changeWord = ""; // Clear the Word
+            finalPhrase = finalPhrase + ' '; // Add the Space
+          }
+          // finalPhrase = finalPhrase + checkWord (changeWord, &hashing, &treeing); // Add the Looked Up Word
+          // // cout << checkWord (changeWord, hashing, treeing);
+          // changeWord = ""; // Clear the Word
+          // finalPhrase = finalPhrase + ' '; // Add the Space
+          // cout << finalPhrase << endl;
       }
       else if (changePhrase [i] < 'a' || changePhrase [i] > 'z') // If Another Symbol
       {
@@ -312,9 +370,21 @@ int main (int argc, char *argv[])
           // cout << checkWord (changeWord, vocab, misspel) << " ";
           // cout << changeWord << " ";
           // changeWord = "";
-          finalPhrase = finalPhrase + checkWord (changeWord, hashing, treeing); // Add the Looked Up Word
-          changeWord = ""; // Clear the Accumulated Word
-          finalPhrase = finalPhrase + changePhrase [i]; // Add the Symbol
+            // cout << "Punctuation, Word: " << changeWord << endl;
+            if (changeWord != "")
+            {
+              finalPhrase = finalPhrase + checkWord (changeWord, &hashing, &treeing); // Add the Looked Up Word
+              changeWord = ""; // Clear the Accumulated Word
+              finalPhrase = finalPhrase + changePhrase [i]; // Add the Symbol
+            }
+            else
+            {
+              finalPhrase = finalPhrase + changePhrase [i]; // Add the Symbol
+            }
+          // finalPhrase = finalPhrase + checkWord (changeWord, &hashing, &treeing); // Add the Looked Up Word
+          // changeWord = ""; // Clear the Accumulated Word
+          // finalPhrase = finalPhrase + changePhrase [i]; // Add the Symbol
+          // cout << finalPhrase << endl;
       }
       // else if (changePhrase [changePhrase.length ()] >= 'a' && changePhrase [changePhrase.length ()] <= 'z')
       // {
@@ -323,8 +393,11 @@ int main (int argc, char *argv[])
       //     // finalPhrase = finalPhrase + changePhrase [i];
       // }
   }
+  auto stop = high_resolution_clock::now();
+  auto duration = duration_cast<microseconds>(stop - start);
   finalPhrase [finalPhrase.length()-1] = ' '; // Remove the Punctutation
   cout << endl << finalPhrase << endl; // Display the Word
-
-  cout << changePhrase << endl;
+  // cout << execTime << endl;
+  cout << duration.count() << endl;
+  // cout << changePhrase << endl;
 }
