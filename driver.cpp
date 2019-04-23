@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
         //s = "";
       }
       //s = "";
-      cout << newPhrase.length() << endl;
+      cout << "Phrase length for hash table and BST:" << endl << newPhrase.length() << endl;
       newPhrase = "";
       auto middle = high_resolution_clock::now();
       // only hashTable: *******************************************************
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
           newPhrase += (BigTable.searchTable(normalWord))->correctSpelling + " ";
         }
       }
-      cout << newPhrase.length() << endl;
+      cout << "Phrase length for hash table only:" << endl << newPhrase.length() << endl;
       newPhrase = "";
       auto stop = high_resolution_clock::now();
       auto duration1 = duration_cast<microseconds>(middle - start);
@@ -171,15 +171,19 @@ string removeSymbols(string input){
 
 string removeSpaces(string input){
   string output;
+  bool addedChar;
   for(int i=0; i<input.length(); i++){
     if(input[i] == ' '){
-      output += ' ';
+      if(addedChar){
+        output += ' ';
+      }
       while(input[i+1] == ' '){
         i++;
       }
     }
     else{
       output += input[i];
+      addedChar = true;
     }
   }
   return output;
