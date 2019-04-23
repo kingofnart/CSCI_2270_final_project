@@ -101,26 +101,32 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
       auto duration1 = duration_cast<microseconds>(middle - start);
       auto duration2 = duration_cast<microseconds>(stop - middle);
       cout << "BST & Hash Table count: " << duration1.count() << " (microseconds)" << endl;
-      cout << "Hash Table only count: " << duration2.count() << " (microseconds)" << endl;
-      // Test Cases
+      cout << "Hash Table only count: " << duration2.count() << " (microseconds)" << endl << endl << endl;
+      cout << "Test Cases:" << endl << endl;
       phrase = "...,, $%!HELLO WORLD! My firends are qwer.";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl;
       phrase = "Do    you knwo youself?";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl;
       phrase = "I loev C++";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl;
       phrase = "!!! A lightyear is a distaNCe UiTN!!!";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl;
       phrase = ", xxx Thsi is 21 centruy NOW!!!";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl;
       phrase = "xxx @ yyy @ zzz";
       cout << "Original phrase: " << endl << phrase << endl;
       printCorrectPhrase(phrase, BSTree, SmallTable);
+      cout << endl << endl;
       string choice = "1";
       while(stoi(choice) != 2){
         displayMenu();
