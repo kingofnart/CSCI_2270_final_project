@@ -8,7 +8,10 @@ using namespace std;
 using namespace std::chrono;
 
 string normalize(string input);
+string removeSymbols(string input);
+string removeSpaces(string input);
 void displayMenu();
+void printCorrectPhrase(string phrase, BST tree, HashTable table);
 
 int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; misspelled document
   if(argc == 4){
@@ -97,8 +100,27 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
       auto stop = high_resolution_clock::now();
       auto duration1 = duration_cast<microseconds>(middle - start);
       auto duration2 = duration_cast<microseconds>(stop - middle);
-      cout << "BST & Hash Table count: " << duration1.count() << endl;
-      cout << "Hash Table only count: " << duration2.count() << endl;
+      cout << "BST & Hash Table count: " << duration1.count() << " (microseconds)" << endl;
+      cout << "Hash Table only count: " << duration2.count() << " (microseconds)" << endl;
+      // Test Cases
+      phrase = "...,, $%!HELLO WORLD! My firends are qwer.";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
+      phrase = "Do    you knwo youself?";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
+      phrase = "I loev C++";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
+      phrase = "!!! A lightyear is a distaNCe UiTN!!!";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
+      phrase = ", xxx Thsi is 21 centruy NOW!!!";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
+      phrase = "xxx @ yyy @ zzz";
+      cout << "Original phrase: " << endl << phrase << endl;
+      printCorrectPhrase(phrase, BSTree, SmallTable);
       string choice = "1";
       while(stoi(choice) != 2){
         displayMenu();
@@ -107,42 +129,7 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
           case 1:
           cout << "Enter the phrase you would like to correct: " << endl;
           getline(cin, phrase);
-          phrase = normalize(phrase);
-          for(int u=0; u<phrase.length(); u++){
-            if(phrase[u] == ' '){
-              if(!SmallTable.isInTable(s)){
-                string search = BSTree.searchKey(s);
-                if(search == ""){
-                  newPhrase += s + " (unkown) ";
-                }
-                else{
-                  newPhrase += search + " ";
-                }
-              }
-              else{
-                newPhrase += s + " ";
-              }
-              s = "";
-            }
-            else{
-              s += phrase[u];
-            }
-          }
-          if(!SmallTable.isInTable(s)){
-            string search = BSTree.searchKey(s);
-            if(search == ""){
-              newPhrase += s + " (unkown)";
-            }
-            else{
-              newPhrase += search;
-            }
-          }
-          else{
-            newPhrase += s;
-          }
-          s = "";
-          cout << "Your corrected phrase:" << endl;
-          cout << newPhrase << endl;
+          printCorrectPhrase(phrase, BSTree, SmallTable);
           newPhrase = "";
           break;
 
@@ -160,24 +147,100 @@ int main(int argc, char* argv[]){ //misspellings file; 10000 comomon words; miss
   return 0;
 }
 
-string normalize(string input){
+string removeSymbols(string input){
   string output;
   for(int i=0; i<input.length(); i++){
-    if(input[i] >= 'A' || input[i] <= 'Z'){
-      output += tolower(input[i]);
+    if(input[i] >= 'a' && input[i] <= 'z'){
+      output += input[i];
     }
-    else if(input[i] = ' '){
+    else if(input[i] >= 'A' && input[i] <= 'Z'){
+      output += input[i];
+    }
+    else if(input[i] == 39 || input[i] == 32){
+      output += input[i];
+    }
+  }
+  return output;
+}
+
+string removeSpaces(string input){
+  string output;
+  for(int i=0; i<input.length(); i++){
+    if(input[i] == ' '){
       output += ' ';
       while(input[i+1] == ' '){
         i++;
       }
     }
-    //only keep letters and apostrophes
-    else if((input[i] >= 'a' && input[i] <= 'z') || input[i] == 39){
+    else{
       output += input[i];
     }
   }
   return output;
+}
+
+string normalize(string input){
+  string output;
+  input = removeSymbols(input);
+  input = removeSpaces(input);
+  for(int i=0; i<input.length(); i++){
+    if(input[i] >= 'A' && input[i] <= 'Z'){
+      output += tolower(input[i]);
+    }
+    else{
+      output += input[i];
+    }
+  }
+  return output;
+}
+
+void printCorrectPhrase(string phrase, BST tree, HashTable table){
+  string stdPhrase = normalize(phrase);
+  string s, newPhrase;
+  for(int u=0; u<stdPhrase.length(); u++){
+    if(stdPhrase[u] == ' '){
+      if(!table.isInTable(s)){
+        string search = tree.searchKey(s);
+        if(search == ""){
+          newPhrase += s + " ";
+          bool number = true;
+          for(int i=0; i<s.length(); i++){
+            if(s[i] < 48 || s[i] > 57){
+              number = false;
+            }
+          }
+          if(!number){
+            newPhrase += "(unkown) ";
+          }
+        }
+        else{
+          newPhrase += search + " ";
+        }
+      }
+      else{
+        newPhrase += s + " ";
+      }
+      s = "";
+    }
+    else{
+      s += stdPhrase[u];
+    }
+  }
+  if(!table.isInTable(s)){
+    string search = tree.searchKey(s);
+    if(search == ""){
+      newPhrase += s + " (unkown)";
+    }
+    else{
+      newPhrase += search;
+    }
+  }
+  else{
+    newPhrase += s;
+  }
+  s = "";
+  cout << "Your corrected phrase:" << endl;
+  cout << newPhrase << endl;
 }
 
 void displayMenu(){
